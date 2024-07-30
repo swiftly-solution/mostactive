@@ -1,0 +1,7 @@
+{
+    "prefix": "[{green}Swiftly{default}]",
+    "table_name": "mostactive",
+    "hours_commands": [
+        "hours"
+    ]
+}
