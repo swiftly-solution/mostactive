@@ -32,6 +32,7 @@ AddEventHandler("OnPlayerSpawn", function(event)
                 tostring(player:GetSteamID())),
             function(err, result)
                 if #result == 0 then
+                    if not player:CBasePlayerController():IsValid() then return end
                     db:Query(string.format("INSERT IGNORE INTO `%s` (name, steamid) VALUES ('%s', '%s')",
                         config:Fetch("mostactive.table_name"), db:EscapeString(player:CBasePlayerController().PlayerName),
                         tostring(player:GetSteamID())))
