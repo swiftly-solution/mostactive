@@ -16,8 +16,12 @@ AddEventHandler("OnPluginStart", function(event)
         commands:Register(config:Fetch("mostactive.hours_commands[" .. (i - 1) .. "]"), HoursCommand)
     end
 
-    SetTimeout(60000, SaveTimer)
+    SetTimer(60000, SaveTimer)
+
 end)
+
+
+
 
 AddEventHandler("OnPlayerSpawn", function(event)
     if not db:IsConnected() then return end
