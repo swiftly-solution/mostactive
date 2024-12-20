@@ -1,27 +1,18 @@
 AddEventHandler("OnPluginStart", function(event)
     db = Database("mostactive")
+    if not db:IsConnected() then return end
 
-    db:Query(
-        "CREATE TABLE IF NOT EXISTS `" ..
-        config:Fetch("mostactive.table_name") ..
-        "` (`name` varchar(128) NOT NULL, `steamid` varchar(128) NOT NULL, `connected_time` int(11) NOT NULL DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;",
-        function(err, result)
-            if #result > 0 then
-                db:Query("ALTER TABLE `" ..
-                    config:Fetch("mostactive.table_name") .. "` ADD UNIQUE KEY `steamid` (`steamid`);")
-            end
-        end)
+    db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name"))):Create({
+        name = "string|max:128",
+        steamid = "string|max:128|unique",
+        connected_time = "integer|default:0"
+    }):Execute()
 
-    for i = 1, config:FetchArraySize("mostactive.hours_commands") do
-        commands:Register(config:Fetch("mostactive.hours_commands[" .. (i - 1) .. "]"), HoursCommand)
+    local cmds = config:Fetch("mostactive.hours_commands")
+    for i=1,#cmds do
+        commands:Register(cmds[i], HoursCommand)
     end
-
-    SetTimer(60000, SaveTimer)
-
 end)
-
-
-
 
 AddEventHandler("OnPlayerSpawn", function(event)
     if not db:IsConnected() then return end
@@ -31,15 +22,12 @@ AddEventHandler("OnPlayerSpawn", function(event)
     if player:IsFakeClient() then return end
 
     if player:IsFirstSpawn() then
-        db:Query(
-            string.format("SELECT * FROM `%s` WHERE steamid = '%s' LIMIT 1", config:Fetch("mostactive.table_name"),
-                tostring(player:GetSteamID())),
-            function(err, result)
+        db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name"))):Select({}):Where("steamid", "=", tostring(player:GetSteamID()))
+            :Execute(function (err, result)
                 if #result == 0 then
                     if not player:CBasePlayerController():IsValid() then return end
-                    db:Query(string.format("INSERT IGNORE INTO `%s` (name, steamid) VALUES ('%s', '%s')",
-                        config:Fetch("mostactive.table_name"), db:EscapeString(player:CBasePlayerController().PlayerName),
-                        tostring(player:GetSteamID())))
+                    db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name")))
+                        :Insert({ name = player:CBasePlayerController().PlayerName, steamid = tostring(player:GetSteamID()) }):Execute()
                 end
             end)
     end
@@ -52,14 +40,13 @@ AddEventHandler("OnPlayerConnectFull", function(event)
     if not player then return end
     if player:IsFakeClient() then return end
 
-    db:Query(
-        string.format("SELECT * FROM `%s` WHERE steamid = '%s' LIMIT 1", config:Fetch("mostactive.table_name"),
-            tostring(player:GetSteamID())),
-        function(err, result)
+    db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name"))):Select({}):Where("steamid", "=", tostring(player:GetSteamID()))
+        :Execute(function (err, result)
+            local connected_time = 0
             if #result > 0 then
-                local connected_time = result[1]["connected_time"] or 0
-                player:SetVar("connected_time", connected_time)
+                connected_time = result[1].connected_time or 0
             end
+            player:SetVar("connected_time", connected_time)
         end)
 end)
 
@@ -69,7 +56,7 @@ AddEventHandler("OnClientDisconnect", function(event, playerid)
     if not player then return end
     if player:IsFakeClient() then return end
 
-    db:Query(string.format("UPDATE `%s` set connected_time = connected_time + %d where steamid = '%s' limit 1",
-        config:Fetch("mostactive.table_name"), player:GetConnectedTime() - player:GetVar("connected_time"),
-        tostring(player:GetSteamID())))
+    db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name")))
+        :Update({ connected_time = player:GetVar("connected_time") + player:GetConnectedTime() })
+        :Where("steamid", "=", tostring(player:GetSteamID())):Execute()
 end)
