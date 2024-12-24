@@ -56,6 +56,8 @@ AddEventHandler("OnClientDisconnect", function(event, playerid)
     if not player then return end
     if player:IsFakeClient() then return end
 
+    if player:GetVar("connected_time") == nil then return end
+
     db:QueryBuilder():Table(tostring(config:Fetch("mostactive.table_name")))
         :Update({ connected_time = player:GetVar("connected_time") + player:GetConnectedTime() })
         :Where("steamid", "=", tostring(player:GetSteamID())):Execute()
