@@ -43,6 +43,8 @@
 
 * After installing the plugin, you need to change the prefix and the `hours` command name from `addons/swiftly/configs/plugins` and if you want, you can change the messages from `addons/swiftly/translations`.
 
+* The command for tophours is ``!tophours``
+
 ### Creating A Pull Request 😃
 
 1. Fork the Project
