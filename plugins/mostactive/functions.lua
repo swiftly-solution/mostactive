@@ -28,13 +28,3 @@ SetTimer(60000, function ()
         end
     end
 end)
-
-function formatTime(seconds)
-    local hours = math.floor(seconds / 3600)
-    local minutes = math.floor((seconds % 3600) / 60)
-    if hours > 0 then
-        return hours .. " hours, " .. minutes .. " minutes"
-    else
-        return minutes .. " minutes"
-    end
-end

@@ -22,10 +22,10 @@ function HoursCommand(playerid, args, argc, silent, prefix)
         end
 
         ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "-------------------------------------")
-        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours CT: {red}" .. formatTime(hours_ct))
-        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours T: {red}" .. formatTime(hours_t))
-        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours SPEC: {red}" .. formatTime(hours_spec))
-        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Total Hours: {red}" .. formatTime(hours_total))
+        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours CT: {red}" .. ComputePrettyTime(hours_ct))
+        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours T: {red}" .. ComputePrettyTime(hours_t))
+        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Hours SPEC: {red}" .. ComputePrettyTime(hours_spec))
+        ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "Total Hours: {red}" .. ComputePrettyTime(hours_total))
         ReplyToCommand(playerid, config:Fetch("mostactive.prefix"), "-------------------------------------")
     end)
 end
@@ -52,7 +52,7 @@ commands:Register("tophours", function (playerid, args, argsCount, silent, prefi
                 if (type(result[i])) == "table" then
                     local name = result[i]["name"]
                     local ore = tonumber(result[i]["hours_ct"] or 0)
-                    local ore_formatted = formatTime(ore)
+                    local ore_formatted = ComputePrettyTime(ore)
                     table.insert(top_ct, { name .. " - " .. ore_formatted.."", "" })
                 end
             end
@@ -70,7 +70,7 @@ commands:Register("tophours", function (playerid, args, argsCount, silent, prefi
                 if (type(result[i])) == "table" then
                     local name = result[i]["name"]
                     local ore = tonumber(result[i]["hours_t"] or 0)
-                    local ore_formatted = formatTime(ore)
+                    local ore_formatted = ComputePrettyTime(ore)
                     table.insert(top_t, { name .. " - " .. ore_formatted.."", "" })
                 end
             end
@@ -88,7 +88,7 @@ commands:Register("tophours", function (playerid, args, argsCount, silent, prefi
                 if (type(result[i])) == "table" then
                     local name = result[i]["name"]
                     local ore = tonumber(result[i]["hours_spec"] or 0)
-                    local ore_formatted = formatTime(ore)
+                    local ore_formatted = ComputePrettyTime(ore)
                     table.insert(top_spec, { name .. " - " .. ore_formatted.."", "" })
                 end
             end
@@ -106,7 +106,7 @@ commands:Register("tophours", function (playerid, args, argsCount, silent, prefi
                 if (type(result[i])) == "table" then
                     local name = result[i]["name"]
                     local ore = tonumber(result[i]["hours_total"] or 0)
-                    local ore_formatted = formatTime(ore)
+                    local ore_formatted = ComputePrettyTime(ore)
                     table.insert(top_total, { name .. " - " .. ore_formatted.."", "" })
                 end
             end
